@@ -1,6 +1,6 @@
 <template>
-  <div class="user-layout">
-    <router-view />
+  <div>
+    404
   </div>
 </template>
 
@@ -9,3 +9,7 @@ export default {
 
 }
 </script>
+
+<style>
+
+</style>
