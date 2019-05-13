@@ -13,6 +13,7 @@ const router = new Router({
     {
       path: '/uesr',
       name: 'uesr',
+      hideInMenu: true,
       component: () => import(/* webpackChunkName: "user" */ './layouts/UserLayout'),
       children: [
         {
@@ -43,11 +44,13 @@ const router = new Router({
         {
           path: '/dashboard',
           name: 'dashboard',
+          meta: {icon: 'dashboard', title: '仪表盘'},
           component: { render: h => h('router-view') },
           children: [
             {
               path: '/dashboard/analysis',
               name: 'analysis',
+              meta: {title: '分析页'},
               component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard/Analysis')
             }
           ]
@@ -56,12 +59,21 @@ const router = new Router({
         {
           path: '/form',
           name: 'form',
+          meta: {icon: 'form', title: '表单'},
           component: { render: h => h('router-view') },
           children: [
             {
+              path: '/form/basic-form',
+              name: 'basicform',
+              meta: {title: '基础表单'},
+              component: () => import(/* webpackChunkName: "form" */ './views/Form/BasicForm'),
+            },
+            {
               path: '/form/step-form',
               name: 'stepform',
-              component: () => import(/* webpackChunkName: "form" */ './views/Form/StepForm/index'),
+              meta: {title: '分布表单'},
+              hideChildrenMenu: true,
+              component: () => import(/* webpackChunkName: "form" */ './views/Form/StepForm'),
               children: [
                 {
                   path: '/form/stepform',
@@ -91,6 +103,7 @@ const router = new Router({
     {
       path: '*',
       name: '404',
+      hideInMenu: true,
       component: NotFound
     }
   ]
