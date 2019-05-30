@@ -72,7 +72,7 @@ const router = new Router({
               path: '/form/step-form',
               name: 'stepform',
               meta: {title: '分布表单'},
-              hideChildrenMenu: true,
+              hideChildrenInMenu: true,
               component: () => import(/* webpackChunkName: "form" */ './views/Form/StepForm'),
               children: [
                 {

@@ -1,8 +1,8 @@
 <template>
   <div style="width: 256px">
     <a-menu
-      :default-selected-keys="['1']"
-      :default-open-keys="['2']"
+      :selected-keys="selectedKeys"
+      :open-keys="openKeys"
       mode="inline"
       :theme="theme"
       :inline-collapsed="collapsed"
@@ -45,36 +45,36 @@ export default {
     'sub-menu': SubMenu,
   },
   data () {
+    this.selectedKeysMap = {}
+    this.openKeysMap = {}
     const menuData = this.getMenuData(this.$router.options.routes)
     return {
       collapsed: false,
-      list: [],
-      menuData
+      menuData,
+      selectedKeys: [],
+      openKeys: []
     }
   },
   methods: {
     toggleCollapsed() {
       this.collapsed = !this.collapsed
     },
-    getMenuData(routes = []) {
+    getMenuData(routes = [], parentKeys = [], selectedKeys) {
       const menuData = []
-      for (const item of routes) {
-        console.log(item)
+      routes.forEach(item => {
         if (item.name && !item.hideInMenu) {
-          const newItem = { ...item }
+          this.openKeysMap[item.path] = parentKeys
+          this.selectedKeysMap[item.path] = [item.path || selectedKeys]
+          const newItem = {...item}
           delete newItem.children
           if (item.children && !item.hideChildrenInMenu) {
-            newItem.children = this.getMenuData(item.children)
+            newItem.children = this.getMenuData(item.children, [...parentKeys, item.path])
           }
           menuData.push(newItem)
-        } else if (
-          !item.hideInMenu &&
-          !item.hideChildrenInMenu &&
-          item.children
-        ) {
+        } else if (!item.hideInMenu && !item.hideChildrenInMenu && item.children) {
           menuData.push(...this.getMenuData(item.children))
         }
-      }
+      })
 
       return menuData
     }
