@@ -2,15 +2,15 @@
   <div style="width: 256px">
     <a-menu
       :selected-keys="selectedKeys"
-      :open-keys="openKeys"
+      :open-keys.sync="openKeys"
       mode="inline"
       :theme="theme"
-      :inline-collapsed="collapsed"
     >
       <template v-for="item in menuData">
         <a-menu-item
           v-if="!item.children"
           :key="item.path"
+          @click="() => $router.push({ path: item.path, query: $route.query })"
         >
           <a-icon
             v-if="item.meta.icon"
@@ -34,6 +34,9 @@
  * SubMenu1.vue https://github.com/vueComponent/ant-design-vue/blob/master/components/menu/demo/SubMenu1.vue
  * */
 import SubMenu from './SubMenu'
+
+import {check} from '../utils/auth'
+
 export default {
   props: {
     theme: {
@@ -44,6 +47,12 @@ export default {
   components: {
     'sub-menu': SubMenu,
   },
+  watch: {
+    '$route.path': function(val) {
+      this.selectedKeys = this.selectedKeysMap[val]
+      this.openKeys = this.collapsed ? [] : this.openKeysMap[val]
+    }
+  },
   data () {
     this.selectedKeysMap = {}
     this.openKeysMap = {}
@@ -51,8 +60,8 @@ export default {
     return {
       collapsed: false,
       menuData,
-      selectedKeys: [],
-      openKeys: []
+      selectedKeys:  this.selectedKeysMap[this.$route.path],
+      openKeys: this.collapsed ? [] : this.openKeysMap[this.$route.path]
     }
   },
   methods: {
@@ -61,7 +70,8 @@ export default {
     },
     getMenuData(routes = [], parentKeys = [], selectedKeys) {
       const menuData = []
-      routes.forEach(item => {
+      for (let item of routes) {
+        if (item.meta && item.meta.authority && check(item.meta.authority)) break
         if (item.name && !item.hideInMenu) {
           this.openKeysMap[item.path] = parentKeys
           this.selectedKeysMap[item.path] = [item.path || selectedKeys]
@@ -69,12 +79,18 @@ export default {
           delete newItem.children
           if (item.children && !item.hideChildrenInMenu) {
             newItem.children = this.getMenuData(item.children, [...parentKeys, item.path])
+          } else {
+            this.getMenuData(
+              item.children,
+              selectedKeys ? parentKeys : [...parentKeys, item.path],
+              selectedKeys || item.path
+            )
           }
           menuData.push(newItem)
         } else if (!item.hideInMenu && !item.hideChildrenInMenu && item.children) {
           menuData.push(...this.getMenuData(item.children))
         }
-      })
+      }
 
       return menuData
     }

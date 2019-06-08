@@ -59,7 +59,6 @@ export default {
       this.visible = false
     },
     handleSettingChange(type, value) {
-      console.log(type, value)
       this.$router.push({ query: {...this.$route.query, [type]: value} })
     }
   },
