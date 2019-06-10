@@ -19,8 +19,7 @@ module.exports = {
             console.log('Skipping proxy for browser request.')
             return '/index.html'
           } else {
-            console.log(req.path)
-            const name = req.path.split('/api/').split('/').join('_')
+            const name = req.path.split('/api/')[1].split('/').join('_')
             const mock = require(`./mock/${name}`)
             const result = mock(req.method)
             delete require.cache[require.resolve(`./mock/${name}`)]
